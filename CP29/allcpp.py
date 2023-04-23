@@ -176,6 +176,8 @@ count = len(ids) ## 抢票的数量 几个人几张
 purchaser_ids=''
 for i in ids:
     purchaser_ids += str(i)+","
+if purchaser_ids.endswith(","):
+    purchaser_ids = purchaser_ids[:-1]
 
 ## 若只进行最后一步 记住上面打印的值填在这儿注释上面的从填账号开始的密码
 # token=""
