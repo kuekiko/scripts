@@ -1,2 +1,2 @@
-# some_script
+# scripts
 自用脚本集合
