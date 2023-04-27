@@ -2,6 +2,8 @@ import hashlib
 import requests
 import time
 import json
+import secrets
+import string
 
 
 # 登陆获取COOKIE
@@ -107,7 +109,9 @@ def commit(token, ticket_type_id, count, purchaser_ids,rtime=30):
     }
     timestamp = str(int(time.time())) ##"1682074579"
     ## 貌似并不校验 sign: a()(t + r + i + e + n)
-    nonce="jcFFFK4pPz2eNGBND3xDxTEyZ7PGCyzm" ## 随机值即可
+    # nonce="jcFFFK4pPz2eNGBND3xDxTEyZ7PGCyzm" ## 32位随机值即可
+    n = string.ascii_letters + string.digits
+    nonce = ''.join(secrets.choice(n) for i in range(32))
     sign=hashlib.md5(f"2x052A0A1u222{timestamp}{nonce}{ticket_type_id}2sFRs".encode('utf-8')).hexdigest()
     # print(f"ticket_type_id={ticket_type_id}")
     # print(f"nonce={nonce}")
@@ -120,7 +124,7 @@ def commit(token, ticket_type_id, count, purchaser_ids,rtime=30):
             url = f"{base_url}?ticketTypeId={ticket_type_id}&count={count}&nonce={nonce}&timeStamp={timestamp}&sign={sign}&purchaserIds={purchaser_ids}"
             response = requests.post(url, json={},timeout=30,headers=headers)
             if response.status_code!=200:
-                ## 几乎就是失败
+                ## 应该就是失败
                 print("请求抢票失败")
                 print(response.text)
             else:
@@ -146,11 +150,8 @@ if password=="":
     password = input("请输入登陆密码：")
 
 token = login(account, password)
-ids = get_purchaser(token)
-if len(ids)==0:
-    print("请在账号中添加购票人信息。")
-    exit(0)
-TicketType = get_TicketType(token,1074) ## 1074 为cp29
+
+TicketType = get_TicketType(token,1074) ## 1074 为cp29 可能会变动？yes则及时修改
 if len(TicketType) == 0:
     print("请求票种信息失败，尝试是手动获取或者重试")
     exit(0)
@@ -170,20 +171,36 @@ while True:
         break
     else:
         print("ID输入错误")
-##
-print("Start ...")
-count = len(ids) ## 抢票的数量 几个人几张 
+## 自己选择购票人信息
+ids = get_purchaser(token)
+if len(ids)==0:
+    print("请在账号中添加购票人信息。")
+    exit(0)
 purchaser_ids=''
+count=0
+while True:
+    tmp = input("请输入购票人ID(多选时中间使用,隔开eg:123,222): ")
+    selected_ids = tmp.split(',')
+    if all(x in ids for x in selected_ids):
+        purchaser_ids = tmp
+        count = len(selected_ids)
+        break
+    else:
+        print("购票人选择有误请重新选择")
+# count = len(ids) ## 抢票的数量 几个人几张 
 for i in ids:
     purchaser_ids += str(i)+","
 if purchaser_ids.endswith(","):
     purchaser_ids = purchaser_ids[:-1]
-
-## 若只进行最后一步 记住上面打印的值填在这儿注释上面的从填账号开始的密码
+## todo 手动选择购票人
+print("start ...")
+## 若只进行最后一步 记住上面打印的值填在这儿 之后注释上面的从填账号开始的地方
 # token=""
 # tid="" #票种ID
 # count=""  # 购票数量
 # purchaser_ids=""  # "12345,23456"
 
-## 时间不要太快 默认30s
-commit(token,tid,count,purchaser_ids,30)
+## 建议开抢之前再使用
+## 单线程 可自己优化为多进程
+req_time = 1
+commit(token,tid,count,purchaser_ids,req_time)
