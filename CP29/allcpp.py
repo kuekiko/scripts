@@ -52,8 +52,8 @@ def get_purchaser(token):
     info = response.json()
     if len(info) != 0:
         for i in info:
-            ids.append(i['id'])
-            print(f"info->{i}")
+            ids.append(str(i['id']))
+            print(f"购票人信息info->{i}")
         return ids
     else:
         return []
@@ -107,20 +107,20 @@ def commit(token, ticket_type_id, count, purchaser_ids,rtime=30):
         "Sec-Fetch-Site": "same-site",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36 Edg/112.0.1722.48"
     }
-    timestamp = str(int(time.time())) ##"1682074579"
-    ## 貌似并不校验 sign: a()(t + r + i + e + n)
-    # nonce="jcFFFK4pPz2eNGBND3xDxTEyZ7PGCyzm" ## 32位随机值即可
-    n = string.ascii_letters + string.digits
-    nonce = ''.join(secrets.choice(n) for i in range(32))
-    sign=hashlib.md5(f"2x052A0A1u222{timestamp}{nonce}{ticket_type_id}2sFRs".encode('utf-8')).hexdigest()
-    # print(f"ticket_type_id={ticket_type_id}")
-    # print(f"nonce={nonce}")
-    # print(f"timestamp={timestamp}")
-    # print(f"sign={sign}")
 
     while True:
     # 拼接完整URL
         try:
+            timestamp = str(int(time.time())) ##"1682074579"
+            ## 貌似并不校验 sign: a()(t + r + i + e + n)
+            # nonce="jcFFFK4pPz2eNGBND3xDxTEyZ7PGCyzm" ## 32位随机值即可
+            n = string.ascii_letters + string.digits
+            nonce = ''.join(secrets.choice(n) for i in range(32))
+            sign=hashlib.md5(f"2x052A0A1u222{timestamp}{nonce}{ticket_type_id}2sFRs".encode('utf-8')).hexdigest()
+            # print(f"ticket_type_id={ticket_type_id}")
+            # print(f"nonce={nonce}")
+            # print(f"timestamp={timestamp}")
+            # print(f"sign={sign}")
             url = f"{base_url}?ticketTypeId={ticket_type_id}&count={count}&nonce={nonce}&timeStamp={timestamp}&sign={sign}&purchaserIds={purchaser_ids}"
             response = requests.post(url, json={},timeout=30,headers=headers)
             if response.status_code!=200:
@@ -204,7 +204,7 @@ req_time = 3
 while True:
     t = input("请输入请求等待时间（单位s）默认3s :")
     if t.isdigit():
-        req_time = int(ttt)
+        req_time = int(t)
         break
     else:
         print("输入一个数字")
