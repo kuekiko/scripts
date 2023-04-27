@@ -140,7 +140,7 @@ def commit(token, ticket_type_id, count, purchaser_ids,rtime=30):
             print(f"发生异常: {e}")
             time.sleep(rtime)
 
-# 需要的信息 发给别人记得清空
+# 需要的信息 发给别人记得清空 嫌麻烦就手动填上不用每次输入
 account = ""
 password = ""
 ## 手动输入
@@ -188,10 +188,10 @@ while True:
     else:
         print("购票人选择有误请重新选择")
 # count = len(ids) ## 抢票的数量 几个人几张 
-for i in ids:
-    purchaser_ids += str(i)+","
-if purchaser_ids.endswith(","):
-    purchaser_ids = purchaser_ids[:-1]
+# for i in ids:
+#     purchaser_ids += str(i)+","
+# if purchaser_ids.endswith(","):
+#     purchaser_ids = purchaser_ids[:-1]
 ## todo 手动选择购票人
 print("start ...")
 ## 若只进行最后一步 记住上面打印的值填在这儿 之后注释上面的从填账号开始的地方
@@ -200,7 +200,14 @@ print("start ...")
 # count=""  # 购票数量
 # purchaser_ids=""  # "12345,23456"
 
+req_time = 3
+while True:
+    t = input("请输入请求等待时间（单位s）默认3s :")
+    if t.isdigit():
+        req_time = int(ttt)
+        break
+    else:
+        print("输入一个数字")
 ## 建议开抢之前再使用
 ## 单线程 可自己优化为多进程
-req_time = 1
 commit(token,tid,count,purchaser_ids,req_time)
