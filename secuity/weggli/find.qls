@@ -1,0 +1,51 @@
+## find strcpy-like/memcpy calls with static arrays
+weggli -R 'func=^str.*cpy$' '{char $b[_]; $func($b, _);}' $@
+
+## find strcpy/memcpy calls with length of $@ input instead of length of destination buffer
+weggli --unique -R 'func=.*cpy$' '{$func($_, _($a), _($a));}' $@
+weggli -R 'func=.*cpy$' '{$func($_, $a._, $a._);}' $@
+
+## strncpy-like with potential arithmetic errors
+weggli --unique -R 'func=.*ncpy$' '{$func($_, _($a), $n - $m);}' $@
+
+## malloc-like calls with potential integer overflows
+weggli -R '$fn=lloc' '{$size; $size=_+_; $fn($size);}' $@
+weggli -R '$fn=lloc' '{$user_num=atoi(_);$fn($user_num);}' $@
+
+## unitialized pointers
+weggli '{ _* $p;NOT: $p = _;$func(&$p);}' $@
+
+## format string functions calls' return values to index buffers
+weggli -R '$fn=printf$' '{$ret = $fn$($b,_,_);$b[$ret] = _;}' $@
+
+
+## no space for zero terminator
+weggli '{$dest=malloc(strlen($buf));strcpy($dest,$buf);}' $@
+
+
+## format string bugs
+weggli -R '$fn=printf$' -R '$arg=[^"]*' '{$fn($arg);}' $@
+weggli -R '$fn=^[^n]*printf$' -R '$arg=[^"]*' '{$fn($arg);}' $@  #for fprintf, printf, etc
+weggli -R '$fn=nprintf$' -R '$arg=[^"]*' '{$fn($_,$_,$arg);}' $@ # for snprintf, etc
+
+## integer overflows
+weggli '{$user_num=atoi(_);$user_num+_;}' $@
+
+## typical buffer overruns in loops
+weggli ' {                                                                                                                                               
+    _ $buf[_]; $t = $buf;while (_) { $t; }
+}' $@
+
+## TOCTOU -> Needs more function names but you get the idea
+weggli -R '$f1=(fopen|chmod|access|stat)' -R '$f2=(fopen|chmod|access|stat)' '{$f1($name);$f2($name);}' $@
+
+## double free
+weggli -R '$fn=free' '{$fn($a);not: $a=_;not: return _;$fn($a);}' $@
+
+## use after free
+weggli -R '$fn=free' '{$fn($a);not: $a=_;not: return _;_($a);}' $@
+
+## find buffers passed as function arguments and freed within the function body
+weggli '_ $fn(_ $buf) {                                                                                        
+    free($buf);
+}' $@
