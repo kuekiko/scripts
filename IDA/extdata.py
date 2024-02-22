@@ -9,7 +9,7 @@ for i in range(end_addr-start_addr):{
 }
 # print(data)
 data1 = []
-key = "47fe0f2b13ca4739306eb3e6442e2f0f6adf2ddde783c56da721fb3f56647d1baff7ef6e0adae9deeecd864ce8df3ca3"
+key = "aaaa"
 j = 0
 for i in data:
     data1.append(i^ord(key[j]))
