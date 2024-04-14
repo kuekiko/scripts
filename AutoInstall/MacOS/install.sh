@@ -14,7 +14,7 @@ brew install --cask warp
 
 ## MouseBoost Pro 右键助手 添加常用的右键
 
-## 
+## Scroll Reverser 用鼠标必备
 
 # 开发
 
