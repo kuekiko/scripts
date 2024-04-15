@@ -1,14 +1,15 @@
 #/bin/bash
-if [ $# != 2 ] ; then
+if [ $# != 1 ] ; then
     echo "USAGE: $0 from to"
-    echo " e.g.: $0 com.sankuai.meituan 127.0.0.1:16666"
+    echo " e.g.: $0 com.sankuai.meituan"
     exit 1;
 fi
 # $1 需要抓取的包名
 NAME=$1
 echo "packageName=$1"
 # $2 本地透明代理的地址 127.0.0.1:16666
-TPROXY=$2
+# TPROXY=$2
+TPROXY="127.0.0.1:16666"
 echo "transparent proxy address is $2"
 # # $3 抓包代理的地址
 # PROXY=$3
