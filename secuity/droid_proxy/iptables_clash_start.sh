@@ -10,7 +10,7 @@ echo "packageName=$1"
 # $2 本地透明代理的地址 127.0.0.1:16666
 # TPROXY=$2
 TPROXY="127.0.0.1:16666"
-echo "transparent proxy address is $2"
+echo "transparent proxy address is $TPROXY"
 # # $3 抓包代理的地址
 # PROXY=$3
 ## 根据版本替换一下

@@ -79,3 +79,25 @@ proxy-groups:
 
 rules:
 ```
+
+## Windows powerShell脚本使用说明
+
+需要先解除执行脚本限制，需要先以管理员权限执行：`Set-ExecutionPolicy AllSigned` 之后需要签名，比较麻烦。。
+执行 `Get-ExecutionPolicy`检查当前的状态
+
+```powershell
+PS C:\Windows\system32> Set-ExecutionPolicy AllSigned
+
+执行策略更改
+执行策略可帮助你防止执行不信任的脚本。更改执行策略可能会产生安全风险，如 https:/go.microsoft.com/fwlink/?LinkID=135170
+中的 about_Execution_Policies 帮助主题所述。是否要更改执行策略?
+[Y] 是(Y)  [A] 全是(A)  [N] 否(N)  [L] 全否(L)  [S] 暂停(S)  [?] 帮助 (默认值为“N”): y
+```
+
+简单的本地签名命令：
+```powershell
+$cert = New-SelfSignedCertificate -DnsName "yourdomain.com" -CertStoreLocation "Cert:\CurrentUser\My" -Type CodeSigningCert
+Set-AuthenticodeSignature -FilePath "path\to\your\script.ps1" -Certificate $cert
+```
+
+！！ 危险操作：`Set-ExecutionPolicy RemoteSigned`  这样可以在本地运行未签名的ps1脚本。
