@@ -1,0 +1,1 @@
+go build -o bin/cp30 main.go api.go
